@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "83929204927",
+    "firebase_url": "https://ridesharing-app-asp-default-rtdb.firebaseio.com",
+    "project_id": "ridesharing-app-asp",
+    "storage_bucket": "ridesharing-app-asp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83929204927:android:a59fb58c18a180dbe2de0a",
+        "android_client_info": {
+          "package_name": "com.asp.RideSharingApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "83929204927-lrp3k9bgn6jmp87cvl04qb8dh2mtk0sl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAinQPUI5y_Rsw_gk7rgo8z315_E25-k2Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "83929204927-lrp3k9bgn6jmp87cvl04qb8dh2mtk0sl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
