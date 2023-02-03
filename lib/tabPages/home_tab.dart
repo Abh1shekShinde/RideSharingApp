@@ -43,6 +43,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
   Set<Marker> markersSet = {};
   Set<Circle> circlesSet = {};
 
+  String userName = "";
+  String userEmail = "";
+
   //This will check if the user has enabled device location or not.
   checkIfLocationPermissionAllowed() async {
     _locationPermission = await Geolocator.requestPermission();
@@ -70,6 +73,9 @@ class _HomeTabPageState extends State<HomeTabPage> {
             userCurrentPosition!, context);
 
     // print("this is your current address : $humanReadableAddress");
+
+    userName = userModelCurrentInfo!.name!;
+    userEmail = userModelCurrentInfo!.email!;
   }
 
   @override
@@ -91,8 +97,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
             data: Theme.of(context)
                 .copyWith(canvasColor: const Color(0xFFFAEEE0)),
             child: MyDrawer(
-              name: userModelCurrentInfo?.name,
-              email: userModelCurrentInfo?.email,
+              name: userName,
+              email: userEmail,
             ),
           ),
         ),
@@ -216,7 +222,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                             //go to the search places Screen
                             var responseFromSearchScreen = await Navigator.push(context, MaterialPageRoute(builder:(c)=> SearchPlacesScreen()));
 
-                            if(responseFromSearchScreen == " obtainedDropOff"){
+                            if(responseFromSearchScreen == "obtainedDropOff"){
                               //Draw Routes  - draw polyline between location and destination.
                               await drawPolyLineFromOriginToDestination();
                             }
@@ -244,7 +250,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                                   Text(
                                     Provider.of<AppInfo>(context).userDropOffLocation != null
                                         ? Provider.of<AppInfo>(context).userDropOffLocation!.locationName!
-                                        :"Your Destination",
+                                        : "Your Destination",
                                     style: const TextStyle(
                                       color: Color(0xFFFF7800),
                                       fontSize: 14,
@@ -294,8 +300,13 @@ class _HomeTabPageState extends State<HomeTabPage> {
     var originPosition = Provider.of<AppInfo>(context, listen: false).userPickupLocation;
     var destinationPosition = Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
 
+
     var originLatLng = LatLng(originPosition!.locationLatitude!, originPosition.locationLongitude!);
     var destinationLatLng = LatLng(destinationPosition!.locationLatitude!, destinationPosition.locationLongitude!);
+
+      debugPrint("Origin LatLang :$originLatLng");
+      debugPrint('Destination LatLang :' + destinationLatLng.toString());
+
 
     //wait till the api fetches data and show some message to the user till data is fetched.
     showDialog(
@@ -309,10 +320,10 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     print("These are the points = ");
     print(directionDetailsInfo!.e_points);
-    print(directionDetailsInfo!.distance_text);
-    print(directionDetailsInfo!.distance_value);
-    print(directionDetailsInfo!.duration_text);
-    print(directionDetailsInfo!.duration_value);
+    print(directionDetailsInfo.distance_text);
+    print(directionDetailsInfo.distance_value);
+    print(directionDetailsInfo.duration_text);
+    print(directionDetailsInfo.duration_value);
 
     PolylinePoints pPoints = PolylinePoints();
     List<PointLatLng> decodedPolyLinePointsResultList = pPoints.decodePolyline(directionDetailsInfo!.e_points!);

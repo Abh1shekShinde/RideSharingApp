@@ -1,4 +1,5 @@
-class Directions{
+class Directions
+{
   String? humanReadableAddress;
   String? locationName;
   String? locationId;
@@ -7,10 +8,9 @@ class Directions{
 
   Directions({
     this.humanReadableAddress,
+    this.locationName,
     this.locationId,
     this.locationLatitude,
-    this.locationName,
     this.locationLongitude,
-});
-
+  });
 }

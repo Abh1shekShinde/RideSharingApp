@@ -20,7 +20,8 @@ class PlacePredictionTileDesign extends StatelessWidget {
   getPlaceDirectionDetails(String? placeId, context) async{
     showDialog(
         context: context,
-        builder: (BuildContext context)=> ProgressDialogue(message: "Setting up your destination \n Hang on ......",)
+        builder: (BuildContext context)=> ProgressDialogue(
+          message: "Setting up your destination \n Hang on ......",)
     );
 
     String placeDirectionDetailsUrl = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
@@ -40,7 +41,15 @@ class PlacePredictionTileDesign extends StatelessWidget {
       directions.locationLongitude = responseApi["result"]["geometry"]["location"]["lng"];
       directions.locationId = placeId;
 
+      print("These are the details \n");
+      print(directions.locationLatitude);
+      print(directions.locationName);
+      print(directions.locationLongitude);
+      print(directions.locationId);
+
+
       Provider.of<AppInfo>(context, listen:false).updateDropOffLocationAddress(directions);
+
       //This will close the screen once the destination is received.
       Navigator.pop(context, "obtainedDropOff");
 
@@ -53,7 +62,6 @@ class PlacePredictionTileDesign extends StatelessWidget {
     return ElevatedButton(
       onPressed: (){
         getPlaceDirectionDetails(predictedPlaces!.place_id, context);
-
       },
 
       style: ElevatedButton.styleFrom(
