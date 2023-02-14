@@ -42,10 +42,10 @@ class PlacePredictionTileDesign extends StatelessWidget {
       directions.locationId = placeId;
 
       print("These are the details \n");
-      print(directions.locationLatitude);
-      print(directions.locationName);
-      print(directions.locationLongitude);
-      print(directions.locationId);
+      print("Name: ${directions.locationName}");
+      print("Latitude: ${directions.locationLatitude}");
+      print("Longitude: ${directions.locationLongitude}");
+      print("LocationID: ${directions.locationId}");
 
 
       Provider.of<AppInfo>(context, listen:false).updateDropOffLocationAddress(directions);

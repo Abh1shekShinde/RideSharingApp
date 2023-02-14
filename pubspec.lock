@@ -146,6 +146,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_geofire:
+    dependency: "direct main"
+    description:
+      name: flutter_geofire
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -413,6 +420,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
+  smooth_star_rating_nsafe:
+    dependency: "direct main"
+    description:
+      name: smooth_star_rating_nsafe
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0+1"
   source_span:
     dependency: transitive
     description:

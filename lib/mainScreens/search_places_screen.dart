@@ -17,14 +17,16 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
 
   void findPlaceAutoCompleteSearch(String inputText) async{
     if(inputText.length > 1){
-      String urlAutoCompleteSearch = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey&components=country:IN";
+      String urlAutoCompleteSearch = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey";
+
+      //https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$inputText&key=$mapKey&components=country:IN
 
       var responseAutoCompleteSearch = await RequestAssistant.receiveRequest(urlAutoCompleteSearch);
 
       if(responseAutoCompleteSearch == "Error Occurred. Try Again"){
         return;
       }
-      // print("This is response form API: ");
+      // print("This is response from API: ");
       // print(responseAutoCompleteSearch);
 
       if(responseAutoCompleteSearch["status"] == "OK"){
@@ -87,7 +89,7 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
                         child: Text(
                           "Search Destination",
                           style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Colors.orange,
                           ),
@@ -140,7 +142,7 @@ class _SearchPlacesScreenState extends State<SearchPlacesScreen> {
               ? Expanded(
             child: ListView.separated(
               itemCount: placesPredictedList.length,
-              physics: ClampingScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               itemBuilder: (context, index){
                 return PlacePredictionTileDesign(
                   predictedPlaces: placesPredictedList[index],

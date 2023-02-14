@@ -1,15 +1,24 @@
 import 'dart:async';
 import 'package:drivers_app/assistants/assistant_methods.dart';
+import 'package:drivers_app/assistants/geofire_assistant.dart';
 import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/mainScreens/search_places_screen.dart';
+import 'package:drivers_app/mainScreens/select_nearest_active_drivers_screen.dart';
+import 'package:drivers_app/models/active_nearby_available_drivers.dart';
 import 'package:drivers_app/widgets/my_drawer.dart';
 import 'package:drivers_app/widgets/progress_dialogue.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../infoHandler/app_info.dart';
+import '../main.dart';
+import '../models/direction_details_info.dart';
 
 class HomeTabPage extends StatefulWidget {
   const HomeTabPage({Key? key}) : super(key: key);
@@ -46,6 +55,19 @@ class _HomeTabPageState extends State<HomeTabPage> {
   String userName = "";
   String userEmail = "";
 
+  String statusText = "Share Ride"; //Driver is offline i.e not sharing ride / searching for ride
+  //Share Ride - Offline
+  //Sharing Ride - Online
+  Color buttonColor = Colors.grey;
+  bool isDriverActive = false;
+
+  bool activeNearbyDriverKeysLoaded = false;
+  BitmapDescriptor? activeNearbyDriverIcon;
+
+  List<ActiveNearbyAvailableDrivers> onlineNearByAvailableDriversList = [];
+
+
+
   //This will check if the user has enabled device location or not.
   checkIfLocationPermissionAllowed() async {
     _locationPermission = await Geolocator.requestPermission();
@@ -72,10 +94,59 @@ class _HomeTabPageState extends State<HomeTabPage> {
         await AssistantMethods.searchAddressForGeographicCoordinates(
             userCurrentPosition!, context);
 
-    // print("this is your current address : $humanReadableAddress");
+    print("this is your current address : $humanReadableAddress");
 
     userName = userModelCurrentInfo!.name!;
     userEmail = userModelCurrentInfo!.email!;
+
+    initializeGeoFireListener();
+  }
+
+  saveRideRequestInformation(){
+    //save the ride request given by the user to database.
+    onlineNearByAvailableDriversList = GeoFireAssistant.activeNearbyAvailableDriversList;
+    searchNearestOnlineDrivers();
+  }
+
+  searchNearestOnlineDrivers() async{
+
+    //When there is no active driver available
+    if(onlineNearByAvailableDriversList.isEmpty){
+      //we have to cancel the ride request
+      if(mounted){
+        setState(() {
+          polyLineSet.clear();
+          markersSet.clear();
+          circlesSet.clear();
+          pLineCoordinatesList.clear();
+        });
+      }
+
+      Fluttertoast.showToast(msg: "No online nearest ride available");
+
+      // MyApp.restartApp(context);
+
+      return;
+    }
+
+    //If there is any nearest online driver available.
+    await retrieveOnlineDriversInformation(onlineNearByAvailableDriversList);
+
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> SelectNearestActiveDriversScreen()));
+
+  }
+
+  retrieveOnlineDriversInformation(List onlineNearestDrivesList) async{
+    DatabaseReference ref = FirebaseDatabase.instance.ref().child("users");
+    for( int i = 0; i<onlineNearByAvailableDriversList.length; i++){
+      await ref.child(onlineNearestDrivesList[i].driverId.toString())
+          .once()
+          .then((dataSnapshot){
+            var driverKeyInfo = dataSnapshot.snapshot.value;
+            dList.add(driverKeyInfo);
+            print("\n-----Driver Key information" + dList.toString() + "-----");
+      });
+    }
   }
 
   @override
@@ -88,6 +159,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   @override
   Widget build(BuildContext context) {
+    createActiveNearbyDriverIconMarker();
     return Scaffold(
         key: skey,
         drawer: Container(
@@ -120,14 +192,21 @@ class _HomeTabPageState extends State<HomeTabPage> {
                 _controllerGoogleMap.complete(controller);
                 newGoogleMapController = controller;
 
-                //Function for getting user location
+                //Function for getting user location - both user as well as driver
                 locateUserPosition();
 
-                setState(() {
-                  bottomPaddingOfMap = 220;
-                });
+                if(mounted){
+                  setState(() {
+                    bottomPaddingOfMap = 220;
+                  });
+                }
               },
             ),
+
+            //Ui for online offline for Driver.
+            statusText != "Share Ride"
+                ? Container()
+                : Container(),
 
             //Custom button for drawer
             Positioned(
@@ -161,8 +240,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
                   height: searchLocationContainerHeight,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 0),
-                    color: Color(0xffE8F9FD), //e3f2fd , e2eafc
-                    borderRadius: BorderRadius.only(
+                    color: const Color(0xffE8F9FD), //e3f2fd , e2eafc
+                    borderRadius: const BorderRadius.only(
                       topRight: Radius.circular(30),
                       topLeft: Radius.circular(30),
                     ),
@@ -220,7 +299,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
                         GestureDetector(
                           onTap: () async {
                             //go to the search places Screen
-                            var responseFromSearchScreen = await Navigator.push(context, MaterialPageRoute(builder:(c)=> SearchPlacesScreen()));
+                            var responseFromSearchScreen = await Navigator.push(context, MaterialPageRoute(builder:(c)=> const SearchPlacesScreen()));
 
                             if(responseFromSearchScreen == "obtainedDropOff"){
                               //Draw Routes  - draw polyline between location and destination.
@@ -270,22 +349,108 @@ class _HomeTabPageState extends State<HomeTabPage> {
                         ),
                         const SizedBox(height: 16),
 
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFFFAA33),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0)
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 50),
+                              //Search Rides button
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if(Provider.of<AppInfo>(context, listen: false).userDropOffLocation != null)
+                                  {
+                                    saveRideRequestInformation();
+                                  }else{
+                                    Fluttertoast.showToast(msg: "Please choose your destination");
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFFFAA33),
+                                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20.0)
+                                    ),
+                                    textStyle: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    )),
+                                child: const Text(
+                                  "Search Ride",
+                                  style: TextStyle(color: Colors.white, fontSize: 14,),
+                                ),
                               ),
-                              textStyle: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              )),
-                          child: const Text(
-                            "Search Ride",
-                            style: TextStyle(color: Colors.white, fontSize: 14,),
-                          ),
-                        )
+
+                            ),
+                              //Button for online offline driver
+                            // Positioned(
+                            //   top: statusText != "Sharing Ride"
+                            //       ? MediaQuery.of(context).size.height * 0.855
+                            //       : MediaQuery.of(context).size.height * 0.855 ,
+                            //   left: 150,
+                            //   right: 0,
+                            //   child: Row(
+                            //     mainAxisAlignment: MainAxisAlignment.center,
+                            //     children: [
+                            ElevatedButton(
+                                      onPressed:(){
+                                        if(isDriverActive != true)//Offline condition
+                                            {
+                                          driverIsOnlineNow();
+                                          updateDriversLocationAtRealTime();
+
+                                          if(mounted){
+                                    setState(() {
+                                      statusText = "Sharing Ride";
+                                      isDriverActive = true;
+                                      buttonColor = Colors.green;
+                                    });
+                                  }
+                                  // display Toast message
+                                          Fluttertoast.showToast(msg: "You are now Sharing your Ride");
+                                        }
+                                        else{
+                                          driverIsOfflineNow();
+                                          if(mounted){
+                                    setState(() {
+                                      statusText = "Share Ride";
+                                      isDriverActive = false;
+                                      buttonColor = Colors.grey;
+                                    });
+                                  }
+                                  // display Toast message
+                                          Fluttertoast.showToast(msg: "You are not Sharing your Ride");
+
+                                        }
+                                      } ,
+                                      style: ElevatedButton.styleFrom(
+                                          backgroundColor: buttonColor,
+                                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                          )
+                                      ),
+                                      child: statusText != "Sharing Ride" ? const Text(
+                                        "Share Ride",
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ): const Text(
+                                        "Stop Sharing Ride",
+                                        style: TextStyle(
+                                          fontSize: 14.0,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),),
+                                    ),
+                            //     ],
+                            //   ),
+                            // ),
+                          ],
+                        ),
+
+
+
                       ],
                     ),
                   ),
@@ -293,8 +458,11 @@ class _HomeTabPageState extends State<HomeTabPage> {
               ),
             ),
           ],
-        ));
+
+        )
+    );
   }
+
 
   Future<void> drawPolyLineFromOriginToDestination() async{
     var originPosition = Provider.of<AppInfo>(context, listen: false).userPickupLocation;
@@ -305,7 +473,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     var destinationLatLng = LatLng(destinationPosition!.locationLatitude!, destinationPosition.locationLongitude!);
 
       debugPrint("Origin LatLang :$originLatLng");
-      debugPrint('Destination LatLang :' + destinationLatLng.toString());
+      debugPrint('Destination LatLang :$destinationLatLng');
 
 
     //wait till the api fetches data and show some message to the user till data is fetched.
@@ -316,17 +484,21 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     var directionDetailsInfo = await AssistantMethods.obtainOriginToDestinationDirectionDetails(originLatLng, destinationLatLng);
 
-    Navigator.pop(context);
+    setState(() {
+      tripDirectionDetailsInfo = directionDetailsInfo;
+    });
+
+    // Navigator.pop(context);
 
     print("These are the points = ");
-    print(directionDetailsInfo!.e_points);
-    print(directionDetailsInfo.distance_text);
-    print(directionDetailsInfo.distance_value);
-    print(directionDetailsInfo.duration_text);
-    print(directionDetailsInfo.duration_value);
+    print(directionDetailsInfo!.e_points!);
+    // print(directionDetailsInfo.distance_text);
+    // print(directionDetailsInfo.distance_value);
+    // print(directionDetailsInfo.duration_text);
+    // print(directionDetailsInfo.duration_value);
 
     PolylinePoints pPoints = PolylinePoints();
-    List<PointLatLng> decodedPolyLinePointsResultList = pPoints.decodePolyline(directionDetailsInfo!.e_points!);
+    List<PointLatLng> decodedPolyLinePointsResultList = pPoints.decodePolyline(directionDetailsInfo.e_points!);
 
     pLineCoordinatesList.clear();
 
@@ -340,19 +512,20 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     polyLineSet.clear();
 
-    setState(() {
-      Polyline polyline = Polyline(
-        color: Colors.orange,
-        polylineId: const PolylineId("PolyLineID"),
-        jointType: JointType.round,
-        points: pLineCoordinatesList,
-        startCap: Cap.roundCap,
-        endCap: Cap.roundCap,
-        geodesic: true,
-      );
-      polyLineSet.add(polyline);
-    });
-
+    if(mounted){
+      setState(() {
+        Polyline polyline = Polyline(
+          color: Colors.orange,
+          polylineId: const PolylineId("PolyLineID"),
+          jointType: JointType.round,
+          points: pLineCoordinatesList,
+          startCap: Cap.roundCap,
+          endCap: Cap.roundCap,
+          geodesic: true,
+        );
+        polyLineSet.add(polyline);
+      });
+    }
 
     //This will help to adjust the zoom as per origin and destination
     LatLngBounds boundsLatLng;
@@ -395,10 +568,12 @@ class _HomeTabPageState extends State<HomeTabPage> {
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
     );
 
-    setState(() {
-      markersSet.add(originMarker);
-      markersSet.add(destinationMarker);
-    });
+    if(mounted){
+      setState(() {
+        markersSet.add(originMarker);
+        markersSet.add(destinationMarker);
+      });
+    }
 
     Circle originCircle =  Circle(
       circleId:const CircleId("originID"),
@@ -418,11 +593,176 @@ class _HomeTabPageState extends State<HomeTabPage> {
       center: destinationLatLng,
     );
 
-    setState(() {
-      circlesSet.add(originCircle);
-      circlesSet.add(destinationCircle);
+    if(mounted){
+      setState(() {
+        circlesSet.add(originCircle);
+        circlesSet.add(destinationCircle);
+      });
+    }
+  }
+
+
+  driverIsOnlineNow() async{
+    Position pos = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+    userCurrentPosition = pos;
+
+    Geofire.initialize("activeDrivers");
+    Geofire.setLocation(
+        currentFirebaseUser!.uid, 
+        userCurrentPosition!.latitude, 
+        userCurrentPosition!.longitude
+    );
+    
+    DatabaseReference ref = FirebaseDatabase.instance.ref()
+        .child("users")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus");
+
+    ref.set("idle");
+    ref.onValue.listen((event) { });
+  }
+
+  updateDriversLocationAtRealTime(){
+    streamSubscriptionPosition = Geolocator.getPositionStream()
+        .listen((Position position)
+    {
+      userCurrentPosition = position;
+      if(isDriverActive == true){
+        Geofire.setLocation(
+            currentFirebaseUser!.uid,
+            userCurrentPosition!.latitude,
+            userCurrentPosition!.longitude
+        );
+      }
+      LatLng latLng = LatLng(
+        userCurrentPosition!.latitude,
+        userCurrentPosition!.longitude,
+      );
+      
+      newGoogleMapController!.animateCamera((CameraUpdate.newLatLng(latLng)));
     });
 
+  }
+
+  driverIsOfflineNow(){
+    Geofire.removeLocation(currentFirebaseUser!.uid);
+    DatabaseReference? ref = FirebaseDatabase.instance.ref()
+        .child("users")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus");
+
+    ref.onDisconnect();
+    ref.remove();
+    ref = null;
+
+
+    // Future.delayed(const Duration(milliseconds: 2000), (){
+    //   SystemChannels.platform.invokeMethod("SystemNavigator.pop");
+    // });
+  }
+
+  initializeGeoFireListener(){
+
+    Geofire.initialize("activeDrivers");
+    Geofire.queryAtLocation(userCurrentPosition!.latitude, userCurrentPosition!.longitude, 5)!.listen((map)
+    //lat long and 5 is the radius in km up to which active drivers will be displayed.
+    {
+      print("Geofire query Map:  $map");
+      if (map != null) {
+        var callBack = map['callBack'];
+
+        //latitude will be retrieved from map['latitude']
+        //longitude will be retrieved from map['longitude']
+
+        switch (callBack) {
+          //When any driver becomes active i.e comes online
+          case Geofire.onKeyEntered:
+            ActiveNearbyAvailableDrivers activeNearbyAvailableDriver = ActiveNearbyAvailableDrivers();
+            activeNearbyAvailableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvailableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvailableDriver.driverId = map['key'];
+            GeoFireAssistant.activeNearbyAvailableDriversList.add(activeNearbyAvailableDriver);
+            if(activeNearbyDriverKeysLoaded == true){
+              displayActiveDriversOnMap();
+            }
+            break;
+
+          //When any driver becomes non active i.e goes offline
+          case Geofire.onKeyExited:
+            GeoFireAssistant.deleteOfflineDriverFromList(map['key']);
+            displayActiveDriversOnMap();
+            break;
+
+          //Whenever driver moves - update the driver location
+          case Geofire.onKeyMoved:
+            ActiveNearbyAvailableDrivers activeNearbyAvailableDriver = ActiveNearbyAvailableDrivers();
+            activeNearbyAvailableDriver.locationLatitude = map['latitude'];
+            activeNearbyAvailableDriver.locationLongitude = map['longitude'];
+            activeNearbyAvailableDriver.driverId = map['key'];
+            GeoFireAssistant.updateActiveNearbyAvailableDriverLocation(activeNearbyAvailableDriver);
+            displayActiveDriversOnMap();
+            break;
+
+            //Display the online active drivers on the map.
+            case Geofire.onGeoQueryReady:
+              activeNearbyDriverKeysLoaded = true;
+              displayActiveDriversOnMap();
+            break;
+        }
+      }
+
+      if(mounted){
+        setState(() {});
+      }
+    });
+  }
+
+  displayActiveDriversOnMap(){
+
+    if(mounted) {
+      setState(() {
+        markersSet.clear();
+        circlesSet.clear();
+
+        Set<Marker> driversMarkerSet = Set<Marker>();
+
+        for (ActiveNearbyAvailableDrivers eachDriver in GeoFireAssistant
+            .activeNearbyAvailableDriversList) {
+          LatLng eachDriverActivePosition = LatLng(
+              eachDriver.locationLatitude!, eachDriver.locationLongitude!);
+          Marker marker = Marker(
+            markerId: MarkerId(eachDriver.driverId!),
+            position: eachDriverActivePosition,
+            icon: activeNearbyDriverIcon!,
+            rotation: 360,
+          );
+
+          driversMarkerSet.add(marker);
+        }
+
+        if(mounted){
+          setState(() {
+            markersSet = driversMarkerSet;
+          });
+        }
+      }
+
+      );
     }
+
+  }
+
+  //custom map marker for nearby drivers
+  createActiveNearbyDriverIconMarker(){
+    if(activeNearbyDriverIcon == null){
+      ImageConfiguration imageConfiguration = createLocalImageConfiguration(context, size: const Size(2,2));
+      BitmapDescriptor.fromAssetImage(imageConfiguration, "images/carMarker.png").then((value){
+        activeNearbyDriverIcon  = value;
+      });
+    }
+
+  }
 
 }
