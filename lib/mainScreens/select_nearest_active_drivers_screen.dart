@@ -1,20 +1,53 @@
 import 'package:drivers_app/assistants/assistant_methods.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 import '../global/global.dart';
 
 
 class SelectNearestActiveDriversScreen extends StatefulWidget {
-  const SelectNearestActiveDriversScreen({Key? key}) : super(key: key);
+
+  DatabaseReference? referenceRideRequest;
+
+  SelectNearestActiveDriversScreen({this.referenceRideRequest});
 
   @override
   _SelectNearestActiveDriversScreenState createState() => _SelectNearestActiveDriversScreenState();
 }
 
 class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDriversScreen> {
+
+  String fareAmount = "";
+  getFareAmountAccordingToVehicleType(int index)
+  {
+    if(tripDirectionDetailsInfo != null){
+      if(dList[index]["vehicle_details"]["vehicleType"].toString() == "Car"){
+        // fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!) * 1.5).toStringAsFixed(1);
+
+      }
+
+      if(dList[index]["vehicle_details"]["vehicleType"].toString() == "Bike"){
+        // fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!)).toString()
+      }
+
+      if(dList[index]["vehicle_details"]["vehicleType"].toString() == "Scooter"){
+        // fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!)/1.3).toStringAsFixed(1)
+      }
+    }
+    return fareAmount;
+  }
+
+  @override
+  void dispose (){
+    //to dispose duplicate drivers in search nearest drivers list
+    super.dispose();
+    dList = [];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,7 +68,9 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
           onPressed: (){
             //Cancel the drivers info page
             //delete/remove the ride request from the database.
-
+            Navigator.pop(context);
+            widget.referenceRideRequest!.remove();
+            Fluttertoast.showToast(msg: "You Have cancelled the ride request");
 
             //SystemNavigator.pop();
           },
@@ -102,8 +137,10 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                 mainAxisAlignment: MainAxisAlignment.center,
                 children:[
                   Text(
-                    "20",
+                    "₹ 20",
+                   //"₹ " + getFareAmountAccordingToVehicleType(index),
                     // AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!).toString(),
+
                     style:const TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -112,8 +149,19 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                   const SizedBox(height: 2 ,),
 
                   Text(
-                    "15 km",
+                    "15 min",
                     // tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.duration_text! : " ",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey,
+                    ),
+                  ),
+
+                  const SizedBox(height: 2 ,),
+
+                  Text(
+                    "4 km",
+                    // tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.distance_text! : " ",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,

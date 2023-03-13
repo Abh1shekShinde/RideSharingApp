@@ -5,6 +5,7 @@ import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/mainScreens/search_places_screen.dart';
 import 'package:drivers_app/mainScreens/select_nearest_active_drivers_screen.dart';
 import 'package:drivers_app/models/active_nearby_available_drivers.dart';
+import 'package:drivers_app/push_notifications/push_notification_system.dart';
 import 'package:drivers_app/widgets/my_drawer.dart';
 import 'package:drivers_app/widgets/progress_dialogue.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -66,6 +67,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   List<ActiveNearbyAvailableDrivers> onlineNearByAvailableDriversList = [];
 
+  DatabaseReference? referenceRideRequest;
+
 
 
   //This will check if the user has enabled device location or not.
@@ -77,7 +80,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     }
   }
 
-//Function for getting user location
+  //Function for getting user location
   locateUserPosition() async {
     Position cPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -102,7 +105,53 @@ class _HomeTabPageState extends State<HomeTabPage> {
     initializeGeoFireListener();
   }
 
+  //Function for notification
+  readCurrentDriverInformation() async{
+    currentFirebaseUser = fAuth.currentUser;
+    PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
+    pushNotificationSystem.initializeCloudMessaging();
+    pushNotificationSystem.generateAndGetToken();
+  }
+
   saveRideRequestInformation(){
+    //1. Save the Ride request Information
+    referenceRideRequest = FirebaseDatabase.instance.ref().child("All Ride Requests").push();
+    //.push() will generate a unique id everytime a ride is requested.
+    
+    var originLocation = Provider.of<AppInfo>(context, listen: false).userPickupLocation;
+    var destinationLocation = Provider.of<AppInfo>(context, listen: false).userDropOffLocation;
+
+    Map originLocationMap = {
+      //"key" : value
+
+      "latitude" : originLocation!.locationLatitude.toString(),
+      "longitude" : originLocation!.locationLongitude.toString(),
+    };
+
+    Map destinationLocationMap = {
+      //"key" : value
+
+      "latitude" : destinationLocation!.locationLatitude.toString(),
+      "longitude" : destinationLocation!.locationLongitude.toString(),
+    };
+
+    Map userInformationMap = {
+      "origin" : originLocationMap,
+      "destination" : destinationLocationMap,
+      "time" : DateTime.now().toString(),
+      "userName" : userModelCurrentInfo!.name,
+      "userPhone" : userModelCurrentInfo!.phone,
+      "originAddress" : originLocation.locationName,
+      "destinationAddress" : destinationLocation.locationName,
+      "driverId" : "waiting",
+    };
+
+    //Add request details to database.
+    referenceRideRequest!.set(userInformationMap);
+
+    //If no available driver
+    referenceRideRequest!.remove();
+
     //save the ride request given by the user to database.
     onlineNearByAvailableDriversList = GeoFireAssistant.activeNearbyAvailableDriversList;
     searchNearestOnlineDrivers();
@@ -132,7 +181,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     //If there is any nearest online driver available.
     await retrieveOnlineDriversInformation(onlineNearByAvailableDriversList);
 
-    Navigator.push(context, MaterialPageRoute(builder: (c)=> SelectNearestActiveDriversScreen()));
+    Navigator.push(context, MaterialPageRoute(builder: (c)=> SelectNearestActiveDriversScreen(referenceRideRequest : referenceRideRequest)));
 
   }
 
@@ -155,6 +204,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     super.initState();
 
     checkIfLocationPermissionAllowed();
+    readCurrentDriverInformation();
   }
 
   @override

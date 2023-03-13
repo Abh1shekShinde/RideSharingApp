@@ -13,7 +13,11 @@ class _EarningsTabPageState extends State<EarningsTabPage> {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-          "Earnings Page"
+          "Earnings Page",
+        style: TextStyle(
+          fontSize: 40,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

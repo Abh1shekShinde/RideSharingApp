@@ -13,7 +13,11 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        "rating page"
+        "Ratings page",
+        style: TextStyle(
+            fontSize: 40,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

@@ -17,6 +17,10 @@ class _ProfileTabPageState extends State<ProfileTabPage> {
       child: ElevatedButton(
         child: const Text(
           "SignOut",
+          style: TextStyle(
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+          ),
         ),
         onPressed:(){
           fAuth.signOut();
