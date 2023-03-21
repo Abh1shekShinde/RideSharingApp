@@ -125,14 +125,14 @@ class _HomeTabPageState extends State<HomeTabPage> {
       //"key" : value
 
       "latitude" : originLocation!.locationLatitude.toString(),
-      "longitude" : originLocation!.locationLongitude.toString(),
+      "longitude" : originLocation.locationLongitude.toString(),
     };
 
     Map destinationLocationMap = {
       //"key" : value
 
       "latitude" : destinationLocation!.locationLatitude.toString(),
-      "longitude" : destinationLocation!.locationLongitude.toString(),
+      "longitude" : destinationLocation.locationLongitude.toString(),
     };
 
     Map userInformationMap = {
@@ -529,7 +529,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     //wait till the api fetches data and show some message to the user till data is fetched.
     showDialog(
         context: context,
-        builder: (BuildContext context) => ProgressDialogue(message: "Please wait...",),
+        builder: (BuildContext context) => ProgressDialogue(message: "Please wait..."),
     );
 
     var directionDetailsInfo = await AssistantMethods.obtainOriginToDestinationDirectionDetails(originLatLng, destinationLatLng);
@@ -565,7 +565,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     if(mounted){
       setState(() {
         Polyline polyline = Polyline(
-          color: Colors.orange,
+          color: const Color(0xFFFFAA33),
+          // color: Colors.black,
           polylineId: const PolylineId("PolyLineID"),
           jointType: JointType.round,
           points: pLineCoordinatesList,
@@ -608,14 +609,14 @@ class _HomeTabPageState extends State<HomeTabPage> {
       markerId: const MarkerId("originID"),
       infoWindow: InfoWindow(title: originPosition.locationName, snippet: "Origin"),
       position: originLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
     );
 
     Marker destinationMarker = Marker(
       markerId: const MarkerId("destinationID"),
       infoWindow: InfoWindow(title: destinationPosition.locationName, snippet: "Destination"),
       position: destinationLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRose),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
     );
 
     if(mounted){
@@ -627,7 +628,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     Circle originCircle =  Circle(
       circleId:const CircleId("originID"),
-      fillColor: Colors.green,
+      fillColor: const Color(0xFFFCF9BE),
       radius: 12,
       strokeWidth: 3,
       strokeColor: Colors.red,
@@ -636,10 +637,10 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
     Circle destinationCircle =  Circle(
       circleId:const CircleId("destinationID"),
-      fillColor: Colors.red,
+      fillColor: const Color(0xFFD6E4E5),
       radius: 12,
       strokeWidth: 3,
-      strokeColor: Colors.white,
+      strokeColor: Colors.red,
       center: destinationLatLng,
     );
 

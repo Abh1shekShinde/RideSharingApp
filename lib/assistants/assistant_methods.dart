@@ -28,7 +28,7 @@ class AssistantMethods {
       humanReadableAddress = requestResponse["results"][0]["formatted_address"];
 
       Directions userPickupAddress = Directions();
-      userPickupAddress.locationLongitude = position.latitude;
+      userPickupAddress.locationLatitude = position.latitude;
       userPickupAddress.locationLongitude= position.longitude;
       userPickupAddress.locationName = humanReadableAddress;
 
