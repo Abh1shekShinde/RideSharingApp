@@ -15,7 +15,7 @@ class _RatingsTabPageState extends State<RatingsTabPage> {
       child: Text(
         "Ratings page",
         style: TextStyle(
-            fontSize: 40,
+            fontSize: 36,
           fontWeight: FontWeight.bold,
         ),
       ),
