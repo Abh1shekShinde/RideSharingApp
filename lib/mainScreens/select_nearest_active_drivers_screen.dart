@@ -22,20 +22,20 @@ class SelectNearestActiveDriversScreen extends StatefulWidget {
 class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDriversScreen> {
 
   String fareAmount = "";
-  getFareAmountAccordingToVehicleType(int index)
-  {
+
+  getFareAmountAccordingToVehicleType(int index){
     if(tripDirectionDetailsInfo != null){
       if(dList[index]["vehicle_details"]["vehicleType"].toString() == "Car"){
-        // fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!) * 1.5).toStringAsFixed(1);
+        fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!) * 1.8).toStringAsFixed(1);
 
       }
 
       if(dList[index]["vehicle_details"]["vehicleType"].toString() == "Bike"){
-        // fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!)).toString()
+        fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!)).toString();
       }
 
       if(dList[index]["vehicle_details"]["vehicleType"].toString() == "Scooter"){
-        // fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!)/1.3).toStringAsFixed(1)
+        fareAmount =  (AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!)/1.25).toStringAsFixed(1);
       }
     }
     return fareAmount;
@@ -93,11 +93,11 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
               leading:  Padding(
                 padding: const EdgeInsets.all(2),
                 child: Image.asset(
-                  "images/" + dList[index]["vehicle_details"]["vehicleType"].toString() + ".jpg",
+                  "images/${dList[index]["vehicle_details"]["vehicleType"]}.jpg",
                   width: 70,
                 ),
               ),
-              // visualDensity: VisualDensity(vertical: 1, horizontal: 2),
+              visualDensity: VisualDensity(vertical: 1, horizontal: 2),
 
               title: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
@@ -121,6 +121,7 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                     ),
                   ),
 
+
                   //Display Driver's Ratings
                   SmoothStarRating(
                     rating: 4,
@@ -137,8 +138,8 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                 mainAxisAlignment: MainAxisAlignment.center,
                 children:[
                   Text(
-                    "₹ 20",
-                   //"₹ " + getFareAmountAccordingToVehicleType(index),
+                    // "₹ 20",
+                   "₹ ${getFareAmountAccordingToVehicleType(index)}",
                     // AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!).toString(),
 
                     style:const TextStyle(
@@ -149,8 +150,8 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                   const SizedBox(height: 2 ,),
 
                   Text(
-                    "15 min",
-                    // tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.duration_text! : " ",
+                    // "15 min",
+                    tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.duration_text! : " ",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,
@@ -160,8 +161,8 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                   const SizedBox(height: 2 ,),
 
                   Text(
-                    "4 km",
-                    // tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.distance_text! : " ",
+                    // "4 km",
+                    tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.distance_text! : " ",
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.grey,

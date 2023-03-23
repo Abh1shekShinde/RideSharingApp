@@ -83,13 +83,13 @@ class AssistantMethods {
   static double calculateFareAmountFromOriginToDestination(DirectionDetailsInfo directionDetailsInfo){
 
 
-    //These 0.1 value is random and can be changed as per your preference.
-     double timeTravelledFarePerMinute = (directionDetailsInfo.duration_value! / 60) * 0.1;
+    //These 0.01 value is random and can be changed as per your preference.
+     double timeTravelledFarePerMinute = (directionDetailsInfo.duration_value! / 60) * 0.01;
 
-     double distanceTravelledFarePerKilometer = (directionDetailsInfo.distance_value! / 1000) * 0.1;
+     double distanceTravelledFarePerKilometer = (directionDetailsInfo.distance_value! / 1000) * 0.05;
 
      // 1 USD = 80 Rupees then multiply by 80
-     double totalFareAmount = (timeTravelledFarePerMinute + distanceTravelledFarePerKilometer) * 80;
+     double totalFareAmount = (timeTravelledFarePerMinute + distanceTravelledFarePerKilometer) * 50;
 
      return double.parse(totalFareAmount.toStringAsFixed(2));
      //toStringAsFixed will limit the double value to max 2 places just like roundup.

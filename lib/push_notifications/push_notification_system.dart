@@ -1,14 +1,16 @@
 import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/models/user_ride_request_information.dart';
+import 'package:drivers_app/push_notifications/notification_dialog_box.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PushNotificationSystem {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  Future initializeCloudMessaging() async {
+  Future initializeCloudMessaging(BuildContext context) async {
     //1. Terminated State -- When the app is closed and app opened directly from the notification.
     FirebaseMessaging.instance
         .getInitialMessage()
@@ -19,7 +21,7 @@ class PushNotificationSystem {
         // print("\nThis is Ride request id: ");
         // print(remoteMessage.data["rideRequestId"]);
 
-        readUserRideRequestInformation(remoteMessage.data["rideRequestId"]);
+        readUserRideRequestInformation(remoteMessage.data["rideRequestId"], context);
 
       }
     });
@@ -30,7 +32,7 @@ class PushNotificationSystem {
       // print("\nThis is Ride request id: ");
       // print(remoteMessage!.data["rideRequestId"]);
 
-      readUserRideRequestInformation(remoteMessage!.data["rideRequestId"]);
+      readUserRideRequestInformation(remoteMessage!.data["rideRequestId"], context);
     });
 
     //3. Background State -- When the app is minimized and app is opened from the notification.
@@ -39,11 +41,11 @@ class PushNotificationSystem {
       // print("\nThis is Ride request id: ");
       // print(remoteMessage!.data["rideRequestId"]);
 
-      readUserRideRequestInformation(remoteMessage!.data["rideRequestId"]);
+      readUserRideRequestInformation(remoteMessage!.data["rideRequestId"], context);
     });
   }
 
-  readUserRideRequestInformation(String userRideRequestId) {
+  readUserRideRequestInformation(String userRideRequestId, context) {
     FirebaseDatabase.instance.ref()
         .child("All Ride Requests")
         .child(userRideRequestId)
@@ -78,11 +80,18 @@ class PushNotificationSystem {
         userRideRequestDetails.userName = userName;
         userRideRequestDetails.userPhone = userPhone;
 
-        print("User Ride request information: ");
-        print(userRideRequestDetails.userName);
-        print(userRideRequestDetails.userPhone);
-        print(userRideRequestDetails.originAddress);
-        print(userRideRequestDetails.destinationAddress);
+        // print("User Ride request information: ");
+        // print(userRideRequestDetails.userName);
+        // print(userRideRequestDetails.userPhone);
+        // print(userRideRequestDetails.originAddress);
+        // print(userRideRequestDetails.destinationAddress);
+        
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => NotificationDialogBox(
+                userRideRequestDetails: userRideRequestDetails,
+            ),
+        );
 
       }else
         {

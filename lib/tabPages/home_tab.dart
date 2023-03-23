@@ -109,7 +109,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   readCurrentDriverInformation() async{
     currentFirebaseUser = fAuth.currentUser;
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
-    pushNotificationSystem.initializeCloudMessaging();
+    pushNotificationSystem.initializeCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
   }
 
@@ -442,33 +442,38 @@ class _HomeTabPageState extends State<HomeTabPage> {
                             //     children: [
                             ElevatedButton(
                                       onPressed:(){
-                                        if(isDriverActive != true)//Offline condition
-                                            {
-                                          driverIsOnlineNow();
-                                          updateDriversLocationAtRealTime();
+                                        if(Provider.of<AppInfo>(context, listen: false).userDropOffLocation != null) {
+                                          if (isDriverActive !=true) //Offline condition
+                                              {
+                                            driverIsOnlineNow();
+                                            updateDriversLocationAtRealTime();
 
-                                          if(mounted){
-                                    setState(() {
-                                      statusText = "Sharing Ride";
-                                      isDriverActive = true;
-                                      buttonColor = Colors.green;
-                                    });
-                                  }
-                                  // display Toast message
-                                          Fluttertoast.showToast(msg: "You are now Sharing your Ride");
-                                        }
-                                        else{
-                                          driverIsOfflineNow();
-                                          if(mounted){
-                                    setState(() {
-                                      statusText = "Share Ride";
-                                      isDriverActive = false;
-                                      buttonColor = Colors.grey;
-                                    });
-                                  }
-                                  // display Toast message
-                                          Fluttertoast.showToast(msg: "You are not Sharing your Ride");
-
+                                            if (mounted) {
+                                              setState(() {
+                                                statusText = "Sharing Ride";
+                                                isDriverActive = true;
+                                                buttonColor = Colors.green;
+                                              });
+                                            }
+                                            // display Toast message
+                                            Fluttertoast.showToast(
+                                                msg: "You are now Sharing your Ride");
+                                          }
+                                          else {
+                                            driverIsOfflineNow();
+                                            if (mounted) {
+                                              setState(() {
+                                                statusText = "Share Ride";
+                                                isDriverActive = false;
+                                                buttonColor = Colors.grey;
+                                              });
+                                            }
+                                            // display Toast message
+                                            Fluttertoast.showToast(
+                                                msg: "You are not Sharing your Ride");
+                                          }
+                                        }else{
+                                          Fluttertoast.showToast(msg: "Please choose your destination");
                                         }
                                       } ,
                                       style: ElevatedButton.styleFrom(
@@ -538,7 +543,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
       tripDirectionDetailsInfo = directionDetailsInfo;
     });
 
-    // Navigator.pop(context);
+    Navigator.pop(context);
 
     print("These are the points = ");
     print(directionDetailsInfo!.e_points!);
@@ -609,7 +614,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
       markerId: const MarkerId("originID"),
       infoWindow: InfoWindow(title: originPosition.locationName, snippet: "Origin"),
       position: originLatLng,
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan),
+      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen),
     );
 
     Marker destinationMarker = Marker(
