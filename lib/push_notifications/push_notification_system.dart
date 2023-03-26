@@ -1,3 +1,4 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/models/user_ride_request_information.dart';
 import 'package:drivers_app/push_notifications/notification_dialog_box.dart';
@@ -53,6 +54,11 @@ class PushNotificationSystem {
         .then((snapData)
     {
       if(snapData.snapshot.value != null){
+
+        //playing a notification sound
+        audioPlayer.open(Audio("music/notification_sound.mp3"));
+        audioPlayer.play();
+
         // Origin Details :
         double originLat = double.parse((snapData.snapshot.value! as Map)["origin"]["latitude"]);
         double originLng = double.parse((snapData.snapshot.value! as Map)["origin"]["longitude"]);
@@ -68,6 +74,8 @@ class PushNotificationSystem {
         String userName = (snapData.snapshot.value! as Map)["userName"];
         String userPhone = (snapData.snapshot.value! as Map)["userPhone"];
 
+        String? rideRequestId = snapData.snapshot.key;
+
 
         UserRideRequestInformation userRideRequestDetails = UserRideRequestInformation();
 
@@ -79,6 +87,8 @@ class PushNotificationSystem {
 
         userRideRequestDetails.userName = userName;
         userRideRequestDetails.userPhone = userPhone;
+
+        userRideRequestDetails.rideRequestId = rideRequestId;
 
         // print("User Ride request information: ");
         // print(userRideRequestDetails.userName);

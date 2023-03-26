@@ -80,99 +80,107 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
       body: ListView.builder(
         itemCount: dList.length,
         itemBuilder: (BuildContext context, int index){
-          return Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10)
-            ),
-            color: Color(0xFFC6EBC5),
-            elevation: 5,
-            shadowColor: Colors.red,
-            margin: const EdgeInsets.all(10),
+          return GestureDetector(
+            onTap: (){
+             setState((){
+               chosenDriverId = dList[index]["id"].toString();
+             });
+             Navigator.pop(context, "driverSelected");
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10)
+              ),
+              color: Color(0xFFC6EBC5),
+              elevation: 5,
+              shadowColor: Colors.red,
+              margin: const EdgeInsets.all(10),
 
-            child: ListTile(
-              leading:  Padding(
-                padding: const EdgeInsets.all(2),
-                child: Image.asset(
-                  "images/${dList[index]["vehicle_details"]["vehicleType"]}.jpg",
-                  width: 70,
+              child: ListTile(
+                leading:  Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: Image.asset(
+                    "images/${dList[index]["vehicle_details"]["vehicleType"]}.jpg",
+                    width: 70,
+                  ),
                 ),
-              ),
-              visualDensity: VisualDensity(vertical: 1, horizontal: 2),
+                visualDensity: VisualDensity(vertical: 1, horizontal: 2),
 
-              title: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  //Display the driver Name
-                  Text(
-                    dList[index]["name"],
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                title: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    //Display the driver Name
+                    Text(
+                      dList[index]["name"],
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red,
+                      )
+                    ),
+
+                    //Display the vehicle model
+                    Text(
+                      dList[index]["vehicle_details"]["vehicleModel"],
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.blue,
+                      ),
+                    ),
+
+
+                    //Display Driver's Ratings
+                    SmoothStarRating(
+                      rating: 4,
+                      color: Colors.amber,
+                      borderColor: Colors.black,
+                      allowHalfRating: true,
+                      starCount: 5,
+                      size: 15,
                     )
-                  ),
+                  ],
+                ),
 
-                  //Display the vehicle model
-                  Text(
-                    dList[index]["vehicle_details"]["vehicleModel"],
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.blue,
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children:[
+                    Text(
+                      // "₹ 20",
+                     "₹ ${getFareAmountAccordingToVehicleType(index)}",
+                      // AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!).toString(),
+
+                      style:const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
 
+                    const SizedBox(height: 2 ,),
 
-                  //Display Driver's Ratings
-                  SmoothStarRating(
-                    rating: 4,
-                    color: Colors.amber,
-                    borderColor: Colors.black,
-                    allowHalfRating: true,
-                    starCount: 5,
-                    size: 15,
-                  )
-                ],
-              ),
-
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children:[
-                  Text(
-                    // "₹ 20",
-                   "₹ ${getFareAmountAccordingToVehicleType(index)}",
-                    // AssistantMethods.calculateFareAmountFromOriginToDestination(tripDirectionDetailsInfo!).toString(),
-
-                    style:const TextStyle(
-                      fontWeight: FontWeight.bold,
+                    Text(
+                      // "15 min",
+                      tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.duration_text! : " ",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 2 ,),
+                    const SizedBox(height: 2 ,),
 
-                  Text(
-                    // "15 min",
-                    tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.duration_text! : " ",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
+                    Text(
+                      // "4 km",
+                      tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.distance_text! : " ",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
                     ),
-                  ),
+                  ],
+                ),
 
-                  const SizedBox(height: 2 ,),
-
-                  Text(
-                    // "4 km",
-                    tripDirectionDetailsInfo !=null ? tripDirectionDetailsInfo!.distance_text! : " ",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
               ),
 
             ),
-
           );
         },
       ),

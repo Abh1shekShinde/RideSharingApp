@@ -1,6 +1,12 @@
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:drivers_app/mainScreens/new_trip_screen.dart';
 import 'package:drivers_app/models/user_ride_request_information.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../global/global.dart';
 
 class NotificationDialogBox extends StatefulWidget {
   UserRideRequestInformation? userRideRequestDetails;
@@ -20,14 +26,14 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(25),
       ),
-      backgroundColor: Colors.black12,
-      elevation: 2,
+      backgroundColor: const Color(0xFF),
+      // elevation: 2,
       child: Container(
         margin: EdgeInsets.all(8),
         width: double.infinity,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          color: const Color(0xFFFFFFE8),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -84,7 +90,6 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                     ],
                   ),
 
-
                   const SizedBox(height: 30),
 
                   //destination location with icon
@@ -95,19 +100,17 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                         width: 25,
                         height: 25,
                       ),
-
                       const SizedBox(
                         width: 15,
                       ),
-
                       Expanded(
                         child: Container(
                           child: Text(
-                        widget.userRideRequestDetails!.destinationAddress!,
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
+                            widget.userRideRequestDetails!.destinationAddress!,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -132,10 +135,13 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)
-                      ),
+                          borderRadius: BorderRadius.circular(20.0)),
                     ),
-                    onPressed: (){
+                    onPressed: () {
+                      //This will stop the notification sound
+                      audioPlayer.pause();
+                      audioPlayer.stop();
+                      audioPlayer = AssetsAudioPlayer();
                       //cancel the request
                       Navigator.pop(context);
                     },
@@ -147,19 +153,24 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                     ),
                   ),
 
-                  const SizedBox(width: 30,),
+                  const SizedBox(
+                    width: 30,
+                  ),
 
                   //Button to accept the request
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green,
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20.0)
-                      ),
+                          borderRadius: BorderRadius.circular(20.0)),
                     ),
-                    onPressed: (){
+                    onPressed: () {
+                      //This will stop the notification sound
+                      audioPlayer.pause();
+                      audioPlayer.stop();
+                      audioPlayer = AssetsAudioPlayer();
                       //Accept the request
-                      Navigator.pop(context);
+                      acceptRideRequest(context);
                     },
                     child: Text(
                       "Accept".toUpperCase(),
@@ -171,10 +182,52 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                 ],
               ),
             ),
-
           ],
         ),
       ),
     );
+  }
+
+  acceptRideRequest(BuildContext context) {
+    String getRideRequestId = "";
+
+    FirebaseDatabase.instance
+        .ref()
+        .child("users")
+        .child(currentFirebaseUser!.uid)
+        .child("newRideStatus")
+        .once()
+        .then((snap) {
+      if (snap.snapshot.value != null) {
+        getRideRequestId = snap.snapshot.value.toString();
+        print("------This is the ride request ID------");
+        print(getRideRequestId);
+      } else {
+        Fluttertoast.showToast(msg: "This ride request does not exist");
+      }
+      // print("------This is the ride request ID------");
+      // print(getRideRequestId);
+      // Fluttertoast.showToast(msg: "getRideRequestId" + getRideRequestId);
+
+      if (getRideRequestId == widget.userRideRequestDetails!.rideRequestId) {
+        FirebaseDatabase.instance
+            .ref()
+            .child("users")
+            .child(currentFirebaseUser!.uid)
+            .child("newRideStatus")
+            .set("accepted");
+
+        //Send the driver to Trip Screen.
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (c) => NewTripScreen(
+                      userRideRequestDetails: widget.userRideRequestDetails,
+                    )));
+      } else {
+        Fluttertoast.showToast(msg: "This Ride Request do not exist");
+      }
+    });
   }
 }

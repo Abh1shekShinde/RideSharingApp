@@ -181,8 +181,32 @@ class _HomeTabPageState extends State<HomeTabPage> {
     //If there is any nearest online driver available.
     await retrieveOnlineDriversInformation(onlineNearByAvailableDriversList);
 
-    Navigator.push(context, MaterialPageRoute(builder: (c)=> SelectNearestActiveDriversScreen(referenceRideRequest : referenceRideRequest)));
+    var response = await Navigator.push(context, MaterialPageRoute(builder: (c)=> SelectNearestActiveDriversScreen(referenceRideRequest : referenceRideRequest)));
 
+    if(response == "driverSelected"){
+      FirebaseDatabase.instance.ref().child("users")
+          .child(chosenDriverId!)
+          .once()
+          .then((snap)=> {
+            if(snap.snapshot.value != null){
+              // send notification to the specific driver.
+              sendNotificationToDriverNow(chosenDriverId!)
+            }else{
+              Fluttertoast.showToast(msg: "This user does not exist.. Try Again!!")
+            }
+      });
+    }
+
+  }
+
+  sendNotificationToDriverNow(String chosenDriverId){
+    //assign ride request to new ride status in users parent node for tha specific chosen driver.
+    FirebaseDatabase.instance.ref().child("users")
+        .child(chosenDriverId!)
+        .child("newRideStatus")
+        .set(referenceRideRequest!.key);
+
+    //Automate the push notification.
   }
 
   retrieveOnlineDriversInformation(List onlineNearestDrivesList) async{
