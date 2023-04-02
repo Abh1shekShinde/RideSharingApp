@@ -41,7 +41,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
   GoogleMapController? newGoogleMapController;
 
   double searchLocationContainerHeight = 220.0;
-  Position? userCurrentPosition;
+
   var geoLocator = Geolocator();
 
   LocationPermission? _locationPermission;
@@ -55,12 +55,6 @@ class _HomeTabPageState extends State<HomeTabPage> {
 
   String userName = "";
   String userEmail = "";
-
-  String statusText = "Share Ride"; //Driver is offline i.e not sharing ride / searching for ride
-  //Share Ride - Offline
-  //Sharing Ride - Online
-  Color buttonColor = Colors.grey;
-  bool isDriverActive = false;
 
   bool activeNearbyDriverKeysLoaded = false;
   BitmapDescriptor? activeNearbyDriverIcon;
@@ -108,6 +102,30 @@ class _HomeTabPageState extends State<HomeTabPage> {
   //Function for notification
   readCurrentDriverInformation() async{
     currentFirebaseUser = fAuth.currentUser;
+
+    await FirebaseDatabase.instance.ref()
+        .child("users")
+        .child(currentFirebaseUser!.uid)
+        .once()
+        .then((DatabaseEvent snap)
+    {
+      if(snap.snapshot.value != null){
+        onlineDriverData.id = (snap.snapshot.value as Map)["id"];
+        onlineDriverData.name = (snap.snapshot.value as Map)["name"];
+        onlineDriverData.phone = (snap.snapshot.value as Map)["phone"];
+        onlineDriverData.email = (snap.snapshot.value as Map)["email"];
+        onlineDriverData.vehicleColor = (snap.snapshot.value as Map)["vehicle_details"]["vehicleColor"];
+        onlineDriverData.vehicleModel = (snap.snapshot.value as Map)["vehicle_details"]["vehicleModel"];
+        onlineDriverData.vehicleNumber = (snap.snapshot.value as Map)["vehicle_details"]["vehicleNumber"];
+        driverVehicleType = (snap.snapshot.value as Map)["vehicle_details"]["vehicleType"];
+
+        print("Driver Car details: ");
+        print(onlineDriverData.name);
+        print(onlineDriverData.vehicleModel);
+        print(onlineDriverData.vehicleType);
+
+      }
+    });
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
     pushNotificationSystem.initializeCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
@@ -542,7 +560,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     );
   }
 
-
+//draw the polyline from source to destination.
   Future<void> drawPolyLineFromOriginToDestination() async{
     var originPosition = Provider.of<AppInfo>(context, listen: false).userPickupLocation;
     var destinationPosition = Provider.of<AppInfo>(context, listen: false).userDropOffLocation;

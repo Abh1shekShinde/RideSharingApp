@@ -8,6 +8,7 @@ import 'package:drivers_app/models/direction_details_info.dart';
 import 'package:drivers_app/models/directions.dart';
 import 'package:drivers_app/models/user_model.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
@@ -82,7 +83,6 @@ class AssistantMethods {
 
   static double calculateFareAmountFromOriginToDestination(DirectionDetailsInfo directionDetailsInfo){
 
-
     //These 0.01 value is random and can be changed as per your preference.
      double timeTravelledFarePerMinute = (directionDetailsInfo.duration_value! / 60) * 0.01;
 
@@ -91,8 +91,35 @@ class AssistantMethods {
      // 1 USD = 80 Rupees then multiply by 80
      double totalFareAmount = (timeTravelledFarePerMinute + distanceTravelledFarePerKilometer) * 50;
 
-     return double.parse(totalFareAmount.toStringAsFixed(2));
+     //"Car", "Bike", "Scooter"
+     if(driverVehicleType == "Car"){
+       double resultFareAmount = (totalFareAmount.truncate()) * 1.8;
+       return resultFareAmount;
+     }else if(driverVehicleType == "Bike"){
+       double resultFareAmount = (totalFareAmount.truncate().toDouble());
+       return resultFareAmount;
+     }else if(driverVehicleType == "Scooter"){
+       double resultFareAmount = (totalFareAmount.truncate()) / 1.25;
+       return resultFareAmount;
+     }else{
+       return totalFareAmount.truncate().toDouble();
+     }
+
+     // return double.parse(totalFareAmount.toStringAsFixed(2));
      //toStringAsFixed will limit the double value to max 2 places just like roundup.
+  }
+
+  static pauseLiveLocationUpdates(){
+    streamSubscriptionPosition?.pause();
+    Geofire.removeLocation(currentFirebaseUser!.uid);
+  }
+
+  static resumeLiveLocationUpdates(){
+    streamSubscriptionPosition!.resume();
+    Geofire.setLocation(
+        currentFirebaseUser!.uid,
+        userCurrentPosition!.latitude,
+        userCurrentPosition!.longitude);
   }
 
 }
