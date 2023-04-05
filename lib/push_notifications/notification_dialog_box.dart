@@ -143,7 +143,33 @@ class _NotificationDialogBoxState extends State<NotificationDialogBox> {
                       audioPlayer.pause();
                       audioPlayer.stop();
                       audioPlayer = AssetsAudioPlayer();
+
                       //cancel the request
+                      FirebaseDatabase.instance
+                          .ref()
+                          .child("All Ride Requests")
+                          .child(widget.userRideRequestDetails!.rideRequestId!)
+                          .remove()
+                          .then((value) {
+                        FirebaseDatabase.instance
+                            .ref()
+                            .child("users")
+                            .child(currentFirebaseUser!.uid)
+                            .child("newRideStatus")
+                            .set("idle");
+                      }).then((value) {
+                        FirebaseDatabase.instance
+                            .ref()
+                            .child("users")
+                            .child(currentFirebaseUser!.uid)
+                            .child("tripsHistory")
+                            .child(widget.userRideRequestDetails!.rideRequestId!)
+                            .remove();
+                      }).then((value) {
+                        Fluttertoast.showToast(
+                            msg: "You cancelled the ride share request.");
+                      });
+
                       Navigator.pop(context);
                     },
                     child: Text(

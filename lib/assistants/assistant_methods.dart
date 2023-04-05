@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:drivers_app/assistants/request_assistant.dart';
@@ -12,6 +13,7 @@ import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
 
 class AssistantMethods {
 
@@ -51,7 +53,6 @@ class AssistantMethods {
     }
     });
   }
-  
 
   static Future<DirectionDetailsInfo?> obtainOriginToDestinationDirectionDetails(LatLng originPosition, LatLng destinationPosition) async{
 
@@ -120,6 +121,43 @@ class AssistantMethods {
         currentFirebaseUser!.uid,
         userCurrentPosition!.latitude,
         userCurrentPosition!.longitude);
+  }
+
+  static sendNotificationToDriverNow(String deviceRegistrationToken, String userRideRequestId, context) async{
+
+    String destinationAddress = userDropOffAddress;
+
+    //All the below maps are done as per requirements and also done in postman
+    Map<String , String> headerNotification ={
+      "Content-Type": 'application/json',
+      "Authorization": cloudMessagingServerToken,
+    };
+
+    Map bodyNotification = {
+      "body":"You have a new ride share Request. \nTo:$destinationAddress",
+      "title":"New Share Request"
+    };
+
+    Map dataMap ={
+      "click_action": "FLUTTER_NOTIFICATION_CLICK",
+      "id" : "1",
+      "status" : "done",
+      "rideRequestId" : userRideRequestId,
+    };
+
+    Map officialNotificationFormat = {
+      "notification" : bodyNotification,
+      "data" : dataMap,
+      "priority" : "high",
+      "to" : deviceRegistrationToken,
+    };
+
+    var responseNotification = http.post(
+        Uri.parse("https://fcm.googleapis.com/fcm/send"),
+        headers: headerNotification,
+        body: jsonEncode(officialNotificationFormat),
+    );
+
   }
 
 }

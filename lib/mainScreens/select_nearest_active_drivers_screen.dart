@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 
 import '../global/global.dart';
-import '../infoHandler/app_info.dart';
+import '../models/user_ride_request_information.dart';
 
 
 class SelectNearestActiveDriversScreen extends StatefulWidget {
@@ -24,6 +24,7 @@ class SelectNearestActiveDriversScreen extends StatefulWidget {
 class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDriversScreen> {
 
   String fareAmount = "";
+
 
   getFareAmountAccordingToVehicleType(int index){
     if(tripDirectionDetailsInfo != null){
@@ -129,8 +130,7 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                         color: Colors.blue,
                       ),
                     ),
-
-
+                    
                     //Display Driver's Ratings
                     SmoothStarRating(
                       rating: 4,
@@ -139,7 +139,8 @@ class _SelectNearestActiveDriversScreenState extends State<SelectNearestActiveDr
                       allowHalfRating: true,
                       starCount: 5,
                       size: 15,
-                    )
+                    ),
+                    
                   ],
                 ),
 

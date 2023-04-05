@@ -1,4 +1,5 @@
 import 'package:drivers_app/assistants/request_assistant.dart';
+import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/global/map_key.dart';
 import 'package:drivers_app/infoHandler/app_info.dart';
 import 'package:drivers_app/models/predicted_places.dart';
@@ -8,7 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../models/directions.dart';
 
-class PlacePredictionTileDesign extends StatelessWidget {
+class PlacePredictionTileDesign extends StatefulWidget {
 
   final PredictedPlaces? predictedPlaces;
 
@@ -16,6 +17,11 @@ class PlacePredictionTileDesign extends StatelessWidget {
     this.predictedPlaces
 });
 
+  @override
+  State<PlacePredictionTileDesign> createState() => _PlacePredictionTileDesignState();
+}
+
+class _PlacePredictionTileDesignState extends State<PlacePredictionTileDesign> {
   //This will return the details of the location selected by the user as a destination
   getPlaceDirectionDetails(String? placeId, context) async{
     showDialog(
@@ -50,6 +56,10 @@ class PlacePredictionTileDesign extends StatelessWidget {
 
       Provider.of<AppInfo>(context, listen:false).updateDropOffLocationAddress(directions);
 
+      setState(() {
+        userDropOffAddress = directions.locationName!;
+      });
+
       //This will close the screen once the destination is received.
       Navigator.pop(context, "obtainedDropOff");
 
@@ -61,7 +71,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: (){
-        getPlaceDirectionDetails(predictedPlaces!.place_id, context);
+        getPlaceDirectionDetails(widget.predictedPlaces!.place_id, context);
       },
 
       style: ElevatedButton.styleFrom(
@@ -82,7 +92,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                 children: [
                   const SizedBox(height: 10,),
                   Text(
-                    predictedPlaces!.main_text!,
+                    widget.predictedPlaces!.main_text!,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 16,
@@ -92,7 +102,7 @@ class PlacePredictionTileDesign extends StatelessWidget {
                   const SizedBox(height: 2,),
 
                   Text(
-                    predictedPlaces!.main_text!,
+                    widget.predictedPlaces!.main_text!,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       fontSize: 12,
