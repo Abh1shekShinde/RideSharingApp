@@ -1,7 +1,10 @@
 import 'package:drivers_app/global/global.dart';
+import 'package:drivers_app/mainScreens/profle_screen.dart';
 import 'package:drivers_app/splashScreen/splash_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../mainScreens/trip_history_screen.dart';
 
 
 class MyDrawer extends StatefulWidget {
@@ -39,7 +42,7 @@ class _MyDrawerState extends State<MyDrawer> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        widget.name.toString(),
+                        "Hi, ${widget.name.toString()}",
                         style: const TextStyle(
                           fontSize: 20,
                           color: Color(0xFF243763),
@@ -65,7 +68,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           GestureDetector(
             onTap: (){
-
+              Navigator.push(context, MaterialPageRoute(builder: (c) => TripsHistoryScreen()));
             },
             child: const ListTile(
               leading: Icon(Icons.history, color: const Color(0xFF243763),),
@@ -82,6 +85,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           GestureDetector(
             onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (c) => ProfileScreen()));
 
             },
             child: const ListTile(

@@ -103,6 +103,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     userEmail = userModelCurrentInfo!.email!;
 
     initializeGeoFireListener();
+
+    AssistantMethods.readTripKeysForOnlineUser(context);
   }
 
   //Function for notification
