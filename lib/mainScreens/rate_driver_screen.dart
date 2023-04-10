@@ -17,6 +17,10 @@ RateDriverScreen({
 }
 
 class _RateDriverScreenState extends State<RateDriverScreen> {
+
+  TextEditingController driverReviewsTextEditingController = TextEditingController();
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,6 +122,30 @@ class _RateDriverScreenState extends State<RateDriverScreen> {
 
               const SizedBox(height: 18.0,),
 
+              TextField(
+                controller: driverReviewsTextEditingController,
+                style: const TextStyle(color: Colors.black),
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.reviews),
+                  labelText: "Reviews",
+                  hintText: "Enter your reviews here",
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.grey)),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 10,
+                  ),
+                  labelStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18.0,),
+
               ElevatedButton(
                   onPressed: ()
                   {
@@ -139,6 +167,29 @@ class _RateDriverScreenState extends State<RateDriverScreen> {
                         double newAverageRatings = (pastRatings + countStarRatings) / 2;
                         rateDriverRef.set(newAverageRatings.toString());
 
+                        Navigator.pop(context);
+                      }
+
+                      Fluttertoast.showToast(msg: "Please Restart the App");
+                    });
+
+                    DatabaseReference driverTextReviews = FirebaseDatabase.instance.ref()
+                        .child("users")
+                        .child(widget.assignedDriverId!)
+                        .child("reviews");
+
+                    driverTextReviews.once().then((snap)
+                    {
+                      if(snap.snapshot.value == null)
+                      {
+                        driverTextReviews.set(driverReviewsTextEditingController);
+                        Navigator.pop(context);
+                      }
+                      else
+                      {
+                        String pastReviews = snap.snapshot.value.toString();
+                        String newReviews = pastReviews + driverReviewsTextEditingController.toString() ;
+                        driverTextReviews.set(newReviews.toString());
                         Navigator.pop(context);
                       }
 

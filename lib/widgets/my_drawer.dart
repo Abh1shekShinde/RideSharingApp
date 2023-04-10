@@ -1,4 +1,5 @@
 import 'package:drivers_app/global/global.dart';
+import 'package:drivers_app/mainScreens/about_screen.dart';
 import 'package:drivers_app/mainScreens/profle_screen.dart';
 import 'package:drivers_app/splashScreen/splash_screen.dart';
 import 'package:flutter/cupertino.dart';
@@ -66,6 +67,7 @@ class _MyDrawerState extends State<MyDrawer> {
 
           const SizedBox( height: 10,),
 
+          //History
           GestureDetector(
             onTap: (){
               Navigator.push(context, MaterialPageRoute(builder: (c) => TripsHistoryScreen()));
@@ -83,27 +85,29 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
           ),
 
+          //Visit Profile
+          // GestureDetector(
+          //   onTap: (){
+          //     Navigator.push(context, MaterialPageRoute(builder: (c) => ProfileScreen()));
+          //   },
+          //   child: const ListTile(
+          //     leading: Icon(Icons.person, color: Color(0xFF243763),),
+          //     title: Text(
+          //       "Visit Profile",
+          //       style: TextStyle(
+          //         color: Color(0xFF243763),
+          //         fontSize: 16,
+          //       ),
+          //     ),
+          //
+          //   ),
+          // ),
+
+          //About Page
+
           GestureDetector(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (c) => ProfileScreen()));
-
-            },
-            child: const ListTile(
-              leading: Icon(Icons.person, color: Color(0xFF243763),),
-              title: Text(
-                "Visit Profile",
-                style: TextStyle(
-                  color: Color(0xFF243763),
-                  fontSize: 16,
-                ),
-              ),
-
-            ),
-          ),
-
-          GestureDetector(
-            onTap: (){
-
+              Navigator.push(context, MaterialPageRoute(builder: (c) => AboutPageScreen()));
             },
             child: const ListTile(
               leading: Icon(Icons.info, color: Color(0xFF243763),),
@@ -118,6 +122,7 @@ class _MyDrawerState extends State<MyDrawer> {
             ),
           ),
 
+          //Sign out
           GestureDetector(
             onTap: (){
               fAuth.signOut();

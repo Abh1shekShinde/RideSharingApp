@@ -16,7 +16,7 @@ class _InfoDesignUIWidgetState extends State<InfoDesignUIWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFFA7FFE4),
+      color: const Color(0xFFFFB84C),
       margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
       child: ListTile(
         leading: Icon(
@@ -26,7 +26,7 @@ class _InfoDesignUIWidgetState extends State<InfoDesignUIWidget> {
         title: Text(
           widget.textInfo!,
           style: const TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.bold
           ),
         ),

@@ -105,6 +105,7 @@ class _HomeTabPageState extends State<HomeTabPage> {
     initializeGeoFireListener();
 
     AssistantMethods.readTripKeysForOnlineUser(context);
+    AssistantMethods.readDriverRatings(context);
   }
 
   //Function for notification
@@ -140,6 +141,8 @@ class _HomeTabPageState extends State<HomeTabPage> {
     PushNotificationSystem pushNotificationSystem = PushNotificationSystem();
     pushNotificationSystem.initializeCloudMessaging(context);
     pushNotificationSystem.generateAndGetToken();
+
+    AssistantMethods.readDriverEarnings(context);
   }
 
   saveRideRequestInformation() {

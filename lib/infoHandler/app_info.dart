@@ -7,6 +7,8 @@ class AppInfo extends ChangeNotifier{
   int countTotalTrips = 0;
   List<String> historyTripKeysList = [];
   List<TripsHistoryModel> allTripsHistoryInformationList = [];
+  String driverTotalEarnings = "0";
+  String driverAverageRatings = "0";
 
 
   void updatePickupLocationAddress(Directions userPickUpAddress){
@@ -33,6 +35,16 @@ class AppInfo extends ChangeNotifier{
   updateOverAllTripsHistoryInformation(TripsHistoryModel eachTripHistory){
     allTripsHistoryInformationList.add(eachTripHistory);
     notifyListeners();
+  }
+
+  updateDriverTotalEarnings(driverEarnings){
+    driverTotalEarnings = driverEarnings;
+
+  }
+
+  updateDriverAverageRatings(String driverRatings){
+    driverAverageRatings = driverRatings;
+
   }
 
 }

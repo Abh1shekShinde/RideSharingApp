@@ -20,7 +20,7 @@ class _HistoryDesignUIWidgetState extends State<HistoryDesignUIWidget> {
     DateTime dateTime = DateTime.parse(dateTimeFromDB);
 
               //Dec 10                            //2022                                      1:12 pm
-    String formattedDateTime = "${DateFormat.MMMd().format(dateTime)}, ${DateFormat.y().format(dateTime)} -${DateFormat.jm().format(dateTime)}";
+    String formattedDateTime = "${DateFormat.MMMd().format(dateTime)}, ${DateFormat.y().format(dateTime)} - ${DateFormat.jm().format(dateTime)}";
     return formattedDateTime;
   }
 

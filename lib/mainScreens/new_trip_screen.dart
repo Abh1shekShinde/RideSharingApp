@@ -656,18 +656,18 @@ class _NewTripScreenState extends State<NewTripScreen> {
             " " +
             onlineDriverData.vehicleModel.toString());
 
-    saveRideRequestIdToDriverHistory();
+    // saveRideRequestIdToDriverHistory();
   }
 
-  saveRideRequestIdToDriverHistory() {
-    DatabaseReference tripsHistoryReference = FirebaseDatabase.instance
-        .ref()
-        .child("users")
-        .child(currentFirebaseUser!.uid)
-        .child("tripsHistory");
-
-    tripsHistoryReference
-        .child(widget.userRideRequestDetails!.rideRequestId!)
-        .set(true);
-  }
+  // saveRideRequestIdToDriverHistory() {
+  //   DatabaseReference tripsHistoryReference = FirebaseDatabase.instance
+  //       .ref()
+  //       .child("users")
+  //       .child(currentFirebaseUser!.uid)
+  //       .child("tripsHistory");
+  //
+  //   tripsHistoryReference
+  //       .child(widget.userRideRequestDetails!.rideRequestId!)
+  //       .set(true);
+  // }
 }

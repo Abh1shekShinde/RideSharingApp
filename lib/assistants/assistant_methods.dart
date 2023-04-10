@@ -201,6 +201,37 @@ class AssistantMethods {
     });
   }
 
+  //for the user sharing ride part
+  static void readTripKeysForOnlineDriver(context) {
+    FirebaseDatabase.instance
+        .ref()
+        .child("All Ride Requests")
+        .orderByChild("driverId")
+        .equalTo(fAuth.currentUser!.uid)
+        .once()
+        .then((snap) {
+      if (snap.snapshot.value != null) {
+        Map keysTripsId = snap.snapshot.value as Map;
+
+        //Count total trips and share it with Provider.
+        int overAllTripsCounter = keysTripsId.length;
+        Provider.of<AppInfo>(context, listen: false)
+            .updateOverAllTripsCounter(overAllTripsCounter);
+
+        //Share trip Keys with Provider.
+        List<String> tripKeysList = [];
+        keysTripsId.forEach((key, value) {
+          tripKeysList.add(key);
+        });
+        Provider.of<AppInfo>(context, listen: false)
+            .updateOverAllTripsKeys(tripKeysList);
+
+        //Trip keys data
+        readTripsHistoryInformation(context);
+      }
+    });
+  }
+
   static void readTripsHistoryInformation(context) {
     var tripsAllKeys = Provider.of<AppInfo>(context, listen: false).historyTripKeysList;
     
@@ -219,4 +250,36 @@ class AssistantMethods {
       });
     }
   }
+
+  static void readDriverEarnings(context){
+    FirebaseDatabase.instance.ref()
+        .child("users")
+        .child(fAuth.currentUser!.uid)
+        .child("earnings")
+        .once()
+        .then((snap){
+          if(snap.snapshot.value != null){
+            String driverEarnings = snap.snapshot.value.toString();
+            Provider.of<AppInfo>(context, listen: false).updateDriverTotalEarnings(driverEarnings);
+          }
+    });
+    readTripKeysForOnlineDriver(context);
+
+  }
+
+  static void readDriverRatings(context){
+    FirebaseDatabase.instance.ref()
+        .child("users")
+        .child(fAuth.currentUser!.uid)
+        .child("ratings")
+        .once()
+        .then((snap){
+      if(snap.snapshot.value != null){
+        String driverRatings = snap.snapshot.value.toString();
+        Provider.of<AppInfo>(context, listen: false).updateDriverAverageRatings(driverRatings);
+      }
+    });
+
+  }
+
 }

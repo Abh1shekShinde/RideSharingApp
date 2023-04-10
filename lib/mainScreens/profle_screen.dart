@@ -1,6 +1,7 @@
 import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/widgets/info_design_ui.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -15,9 +16,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       // backgroundColor: const Color(0xFFC8F2EF),
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage("images/profileBackgroundImage.jpg"),
+            colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.7), BlendMode.modulate,),
             fit: BoxFit.cover,
           ),
         ),
@@ -29,8 +31,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text(
                 userModelCurrentInfo!.name!,
                 style:const TextStyle (
-                  color: Color(0xFF4D4D4D),
-                  fontSize: 60,
+                  color: Color(0xFF000000),
+                  fontSize: 72,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -39,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 20,
                   width: 300,
                 child: Divider(
-                  color: const Color(0xFFD989B5),
+                  color: Color(0xFFE21818),
                   height: 3,
                   thickness: 2,
                 ),
@@ -77,7 +79,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: const Text(
                   "Close",
                   style: TextStyle(
-                    color: Colors.white
+                    color: Colors.black,
+                    fontSize: 18
                   ),
                 ),
                 ),
