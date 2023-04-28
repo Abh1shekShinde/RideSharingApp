@@ -1,4 +1,4 @@
-# drivers_app
+# Ride Sharing App - Hop On
 
 A new Flutter project.
 
