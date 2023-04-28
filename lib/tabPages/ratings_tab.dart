@@ -1,8 +1,6 @@
 import 'package:drivers_app/global/global.dart';
 import 'package:drivers_app/infoHandler/app_info.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_star_rating_nsafe/smooth_star_rating.dart';
 

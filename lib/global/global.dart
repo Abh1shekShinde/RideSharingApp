@@ -45,6 +45,6 @@ String userPhone = "";
 String titleStarsRating = "";
 double countStarRatings = 0.0;
 
-String titleStarRating = "No rating yet";
+String titleStarRating = "Good";
 
 String cloudMessagingServerToken = "key=AAAAE4qSCL8:APA91bHxwQLyMUR8LSNBc5h3hX_LEpI8IvMIuysiLUDBdzvSAxx2-i5Ro9rcqtT5fdzIt9d5f-2sKh5BnFWM2ZMQmC6QN44bqjzgCTCRKbMefRY6dW3Far9NVLjpwJwCZXbbIdSXV3nG" ;
