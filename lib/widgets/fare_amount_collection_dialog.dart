@@ -1,5 +1,8 @@
 import 'package:drivers_app/global/global.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import '../mainScreens/dummy_qr_code.dart';
 
 class FareAmountCollectionDialog extends StatefulWidget {
 
@@ -85,7 +88,8 @@ class _FareAmountCollectionDialogState extends State<FareAmountCollectionDialog>
             ),
 
             const SizedBox(height: 10,),
-            
+
+            //Collect Cash Button
             Padding(
               padding: const EdgeInsets.all(18.0),
 
@@ -97,7 +101,7 @@ class _FareAmountCollectionDialogState extends State<FareAmountCollectionDialog>
                 ),
                 onPressed: (){
                   Future.delayed(const Duration(milliseconds: 2000), (){
-                    // SystemNavigator.pop();
+                    SystemNavigator.pop();
 
                   });
                 },
@@ -126,46 +130,45 @@ class _FareAmountCollectionDialogState extends State<FareAmountCollectionDialog>
               ),
             ),
 
-            // Padding(
-            //   padding: const EdgeInsets.all(18.0),
-            //   child: ElevatedButton(
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: Colors.green,
-            //       shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(20.0)),
-            //     ),
-            //     onPressed: (){
-            //       Future.delayed(const Duration(milliseconds: 2000), (){
-            //         // SystemNavigator.pop();
-            //
-            //       });
-            //     },
-            //     child: Row(
-            //       mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
-            //       children: const [
-            //         Text(
-            //           "Open QR Code",
-            //           style: TextStyle(
-            //               fontSize: 20,
-            //               color: Colors.white,
-            //               fontWeight: FontWeight.bold
-            //           ),
-            //         ),
-            //
-            //         Text(
-            //           "♾",
-            //           style: TextStyle(
-            //               fontSize: 20,
-            //               color: Colors.white,
-            //               fontWeight: FontWeight.bold
-            //           ),
-            //         ),
-            //       ],
-            //     ),
-            //   ),
-            //
-            //
-            // ),
+            //Open QR code button
+            Padding(
+              padding: const EdgeInsets.only(left: 18, right: 18, bottom: 20),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0)),
+                ),
+                onPressed: (){
+                  Future.delayed(const Duration(milliseconds: 2000), (){
+                    // SystemNavigator.pop();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (c) =>
+                            const DummyQRCodeScreen()));
+
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly ,
+                  children: const [
+                    Text(
+                      "Open QR Code",
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+
+                    Icon( Icons.qr_code_outlined, ),
+                  ],
+                ),
+              ),
+
+
+            ),
 
             const SizedBox(height: 5),
 
